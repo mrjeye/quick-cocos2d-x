@@ -68,7 +68,7 @@ bool CCHTTPRequest::initWithUrl(const char *url, int method)
     }
     
     ++s_id;
-    // CCLOG("CCHTTPRequest[0x%04x] - create request with url: %s", s_id, url);
+    CCLOG("CCHTTPRequest[0x%04x] - create request with url: %s", s_id, url);
     return true;
 }
 
@@ -115,6 +115,25 @@ void CCHTTPRequest::setPOSTData(const char *data)
     m_postFields.clear();
     curl_easy_setopt(m_curl, CURLOPT_POST, 1L);
     curl_easy_setopt(m_curl, CURLOPT_COPYPOSTFIELDS, data);
+}
+
+void CCHTTPRequest::addFormFile(const char *name, const char *filePath, const char *contentType)
+{
+	curl_formadd(&m_formPost, &m_lastPost,
+		CURLFORM_COPYNAME, name,
+		CURLFORM_FILE, filePath,
+		CURLFORM_CONTENTTYPE, contentType,
+		CURLFORM_END);
+	//CCLOG("addFormFile %s %s %s", name, filePath, contentType);
+}
+
+void CCHTTPRequest::addFormContents(const char *name, const char *value)
+{
+	curl_formadd(&m_formPost, &m_lastPost,
+		CURLFORM_COPYNAME, name,
+		CURLFORM_COPYCONTENTS, value,
+		CURLFORM_END);
+	//CCLOG("addFormContents %s %s", name, value);
 }
 
 void CCHTTPRequest::setCookieString(const char *cookie)
@@ -320,7 +339,7 @@ void CCHTTPRequest::update(float dt)
     }
     
     CCDirector::sharedDirector()->getScheduler()->unscheduleAllForTarget(this);
-    if (m_curlState == kCCHTTPRequestCURLStateBusy)
+    if (m_curlState != kCCHTTPRequestCURLStateIdle)
     {
         CCDirector::sharedDirector()->getScheduler()->scheduleSelector(schedule_selector(CCHTTPRequest::checkCURLState), this, 0, false);
     }
@@ -401,6 +420,11 @@ void CCHTTPRequest::onRequest(void)
         chunk = curl_slist_append(chunk, (*it).c_str());
     }
 
+	if (m_formPost)
+	{
+		curl_easy_setopt(m_curl, CURLOPT_HTTPPOST, m_formPost);
+	}
+
     curl_slist *cookies = NULL;
     curl_easy_setopt(m_curl, CURLOPT_HTTPHEADER, chunk);
     CURLcode code = curl_easy_perform(m_curl);
@@ -424,6 +448,11 @@ void CCHTTPRequest::onRequest(void)
 
     curl_easy_cleanup(m_curl);
     m_curl = NULL;
+	if (m_formPost)
+	{
+		curl_formfree(m_formPost);
+		m_formPost = NULL;
+	}
     curl_slist_free_all(chunk);
     
     m_errorCode = code;

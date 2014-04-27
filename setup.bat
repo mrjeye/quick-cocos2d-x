@@ -17,3 +17,6 @@ echo.
 %SETX% QUICK_COCOS2DX_ROOT %QUICK_COCOS2DX_ROOT%
 
 echo.
+
+pause
+

@@ -13,10 +13,14 @@ cc.c4f = ccc4f
 
 cc.TOUCH_IGNORE               = 0
 cc.TOUCH_BEGAN                = 1
+cc.TOUCH_BEGAN_SWALLOWS       = cc.TOUCH_BEGAN
 cc.TOUCH_BEGAN_NO_SWALLOWS    = 2
-cc.TOUCH_MOVED                = 0
-cc.TOUCH_MOVED_SWALLOWS       = 1
+cc.TOUCH_MOVED                = 1
+cc.TOUCH_MOVED_SWALLOWS       = cc.TOUCH_MOVED
+cc.TOUCH_MOVED_NO_SWALLOWS    = 0
 cc.TOUCH_MOVED_RELEASE_OTHERS = 2
+cc.MULTI_TOUCHES_ON           = true
+cc.MULTI_TOUCHES_OFF          = false
 
 cc.size2t = function(size)
     return {width = size.width, height = size.height}
@@ -46,3 +50,4 @@ require(cc.PACKAGE_NAME .. ".cocos2dx.CCNodeExtend")
 require(cc.PACKAGE_NAME .. ".cocos2dx.CCSceneExtend")
 require(cc.PACKAGE_NAME .. ".cocos2dx.CCSpriteExtend")
 require(cc.PACKAGE_NAME .. ".cocos2dx.CCLayerExtend")
+require(cc.PACKAGE_NAME .. ".cocos2dx.CCDrawNodeExtend")

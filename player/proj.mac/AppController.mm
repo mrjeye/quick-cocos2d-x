@@ -82,6 +82,29 @@ using namespace cocos2d::extra;
 
     [window orderFrontRegardless];
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+    
+    NSButton *miniaturizeButton = [window standardWindowButton:NSWindowMiniaturizeButton];
+    [miniaturizeButton setTarget:self];
+    [miniaturizeButton setAction:@selector(onClickMiniaturize:)];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSWindowDidBecomeMainNotification object:window];
+}
+
+
+- (void) onClickMiniaturize:(id)sender
+{
+    isMinimized = YES;
+    cocos2d::CCApplication::sharedApplication()->applicationDidEnterBackground();
+    [window miniaturize:self];
+}
+
+-(void) applicationDidBecomeActive:(NSNotification *)notification
+{
+    if ([notification object] == window && isMinimized)
+    {
+        isMinimized = NO;
+        cocos2d::CCApplication::sharedApplication()->applicationWillEnterForeground();
+    }
 }
 
 - (BOOL) applicationShouldTerminateAfterLastWindowClosed:(NSApplication*)theApplication
@@ -101,7 +124,7 @@ using namespace cocos2d::extra;
 
 - (void) windowWillClose:(NSNotification *)notification
 {
-    [[NSApplication sharedApplication] terminate:self];
+    [[NSRunningApplication currentApplication] terminate];
 }
 
 - (void) openConsoleWindow
@@ -111,11 +134,14 @@ using namespace cocos2d::extra;
         consoleController = [[ConsoleWindowController alloc] initWithWindowNibName:@"ConsoleWindow"];
     }
     [consoleController.window orderFrontRegardless];
+}
 
+- (void) startWriteDebugLog
+{
     //set console pipe
     pipe = [NSPipe pipe] ;
     pipeReadHandle = [pipe fileHandleForReading] ;
-
+    
     int outfd = [[pipe fileHandleForWriting] fileDescriptor];
     if (dup2(outfd, fileno(stderr)) != fileno(stderr) || dup2(outfd, fileno(stdout)) != fileno(stdout))
     {
@@ -203,6 +229,11 @@ using namespace cocos2d::extra;
     if (projectConfig.isShowConsole())
     {
         [self openConsoleWindow];
+    }
+    
+    if(projectConfig.isWriteDebugLogToFile() || projectConfig.isShowConsole())
+    {
+        [self startWriteDebugLog];
     }
 
     app = new AppDelegate();
@@ -425,8 +456,9 @@ using namespace cocos2d::extra;
 
 - (void) relaunch:(NSArray*)args
 {
+    [[NSRunningApplication currentApplication] hide];
     [self launch:args];
-    [[NSApplication sharedApplication] terminate:self];
+    [[NSRunningApplication currentApplication] terminate];
 }
 
 - (void) relaunch
@@ -478,11 +510,15 @@ using namespace cocos2d::extra;
     NSData *data = [[note userInfo] objectForKey:NSFileHandleNotificationDataItem];
     NSString *str = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
     //show log to console
-    [consoleController trace:str];
-    if(fileHandle!=nil){
+    if(projectConfig.isShowConsole())
+    {
+        [consoleController trace:str];
+    }
+    //write log to file
+    if(fileHandle!=nil)
+    {
         [fileHandle writeData:[str dataUsingEncoding:NSUTF8StringEncoding]];
     }
-
 }
 
 - (void) closeDebugLogFile

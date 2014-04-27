@@ -209,6 +209,20 @@ class ScriptsCompiler
                 $moduleName = substr(substr($path, $this->config['srcpathLength']), 0, -4);
                 $tempFilePath = $this->config['srcpath'] . DS . $moduleName . '.bytes';
                 $moduleName = str_replace(DS, '.', $moduleName);
+                $skip = false;
+
+                foreach ($this->config['excludes'] as $key2 => $exclude)
+                {
+                    if (substr($moduleName, 0, strlen($exclude)) == $exclude)
+                    {
+                        unset($files[$key2]);
+                        $skip = true;
+                        break;
+                    }
+                }
+
+                if ($skip) continue;
+
                 $bytesName = 'lua_m_' . strtolower(str_replace(array('.', '-'), '_', $moduleName));
 
                 $modules[$path] = array(
@@ -234,6 +248,7 @@ class ScriptsCompiler
 
     protected function compileModules(array $modules, $key = null, $sign = null)
     {
+        $xxtea = null;
         if (!empty($key))
         {
             $xxtea = new XXTEA();
@@ -244,7 +259,7 @@ class ScriptsCompiler
         foreach ($modules as $path => $module)
         {
             $bytes = getScriptFileBytecodes($path, $module['tempFilePath']);
-            if (!empty($key))
+            if ($xxtea)
             {
                 $bytes = $sign . $xxtea->encrypt($bytes);
                 file_put_contents($module['tempFilePath'], $bytes);
@@ -479,33 +494,6 @@ EOT;
         }
     }
 
-
-//    function dump($outputFileBasename)
-//    {
-
-//
-//### HOW TO USE ###
-//
-//1. Add code to AppDelegate.cpp:
-//
-//    extern "C" {
-//    #include "${outputFileBasename}.h"
-//    }
-//
-//2. Add code to AppDelegate::applicationDidFinishLaunching()
-//
-//    CCScriptEngineProtocol* pEngine = CCScriptEngineManager::sharedManager()->getScriptEngine();
-//    luaopen_${outputFileBasename}(pEngine->getLuaState());
-//
-//    pEngine->executeString("require(\"main\")");
-//
-//
-//EOT;
-//        }
-//
-//    }
-//
-//
     private function encodeBytesToString($bytes)
     {
         $len      = strlen($bytes);
