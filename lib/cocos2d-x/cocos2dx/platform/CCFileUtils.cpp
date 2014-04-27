@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ****************************************************************************/
 
+#define CRYPTO_ON false
+
 #include "CCFileUtils.h"
 #include "CCDirector.h"
 #include "cocoa/CCDictionary.h"
@@ -30,6 +32,13 @@ THE SOFTWARE.
 #include "support/tinyxml2/tinyxml2.h"
 #include "support/zip_support/unzip.h"
 #include <stack>
+
+#if CRYPTO_ON
+#include "cocos2dx_extra.h"
+#include "CCCrypto.h"
+
+USING_NS_CC_EXTRA;
+#endif
 
 using namespace std;
 
@@ -463,7 +472,7 @@ void CCFileUtils::purgeFileUtils()
 }
 
 CCFileUtils::CCFileUtils()
-: m_pFilenameLookupDict(NULL)
+: m_pFilenameLookupDict(NULL), m_cryptoEnabled(false)
 {
 }
 
@@ -501,7 +510,21 @@ unsigned char* CCFileUtils::getFileData(const char* pszFileName, const char* psz
         *pSize = ftell(fp);
         fseek(fp,0,SEEK_SET);
         pBuffer = new unsigned char[*pSize];
+        
         *pSize = fread(pBuffer,sizeof(unsigned char), *pSize,fp);
+        
+        if (m_cryptoEnabled) {
+            // is crypto enabled?
+            std::string extname = getExtname(fullPath.c_str());
+            
+            if (m_cryptoExtnames.find(extname) != std::string::npos) {
+                unsigned char* pBuffer_ = cryptoData(pBuffer, pSize);
+                
+                delete [] pBuffer;  // delete old buff
+                pBuffer = pBuffer_;
+            }
+        }
+        
         fclose(fp);
     } while (0);
     
@@ -717,6 +740,18 @@ void CCFileUtils::addSearchPath(const char* path)
 }
 	}
 
+/**
+ * Mr.J(Jan_17,2013) == Insert search path
+ *
+ */
+void CCFileUtils::insertSearchPath(const char* path) {
+    if (path && strlen(path) > 0) {
+        m_searchPathArray.insert(m_searchPathArray.begin(), path);
+        
+        updateSearchPathArrayCheck();
+    }
+}
+
 void CCFileUtils::setFilenameLookupDictionary(CCDictionary* pFilenameLookupDict)
 {
     m_fullPathCache.clear();
@@ -816,6 +851,74 @@ void CCFileUtils::updateSearchPathArrayCheck(void)
     {
         m_searchPathArrayCheck.push_back(m_strDefaultResRootPath);
     }
+}
+
+/**
+ * crypto
+ */
+std::string CCFileUtils::getExtname(const char* file) {
+    int epos = -1;
+    for (int i = 0; i < strlen(file); i ++) {
+        if ('.' == file[i]) {
+            epos = i;
+        }
+    }
+    
+    if (epos != -1) {
+        int elen = strlen(file) - epos;
+        
+        char buff[32] = {0};
+        memcpy(buff, file + epos, elen);
+        
+        return std::string(buff);
+    }
+    
+    return "";
+}
+
+unsigned char* CCFileUtils::cryptoData(unsigned char* data, unsigned long* pSize) {
+#if CRYPTO_ON
+    const char* key = m_cryptoKey.c_str();
+    
+    // the real data size
+    int rSize;
+    
+    unsigned char* rdata = cocos2d::extra::CCCrypto::decryptXXTEA(data, *pSize, (unsigned char*)key, strlen(key), &rSize);
+    // update the real data size
+    *pSize = rSize;
+    
+    // realloc
+    unsigned char* ret = new unsigned char[rSize];
+    memcpy(ret, rdata, rSize);
+    
+    return ret;
+#else
+    unsigned char* ret = new unsigned char[*pSize];
+    memcpy(ret, data, *pSize);
+    
+    return ret;
+#endif
+}
+
+/**
+ * Set the crypto info.
+ *
+ * key:         key
+ * extnames:    extnames
+ */
+void CCFileUtils::enabledCrypto(const char* key, const char* extnames) {
+    m_cryptoKey = key;
+    m_cryptoExtnames = extnames;
+    
+    m_cryptoEnabled = true;
+}
+
+/**
+ * Disable crypto
+ */
+void CCFileUtils::disableCrypto() {
+    m_cryptoEnabled = false;
+    m_cryptoKey = "";
 }
 
 NS_CC_END

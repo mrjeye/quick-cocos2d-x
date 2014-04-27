@@ -6,6 +6,8 @@
 #include "CCLuaEngine.h"
 #include <string>
 
+#include "FilterSprite_luabinding.h"
+
 using namespace std;
 using namespace cocos2d;
 using namespace CocosDenshion;
@@ -31,10 +33,12 @@ bool AppDelegate::applicationDidFinishLaunching()
 
     // set FPS. the default value is 1.0/60 if you don't call this
     pDirector->setAnimationInterval(1.0 / 60);
-
+    
     // register lua engine
     CCScriptEngineManager::sharedManager()->setScriptEngine(CCLuaEngine::defaultEngine());
-
+    
+    luaopen_FilterSprite_luabinding(CCLuaEngine::defaultEngine()->getLuaStack()->getLuaState());
+    
     StartupCall *call = StartupCall::create(this);
     if (m_projectConfig.getDebuggerType() != kCCLuaDebuggerNone)
     {
@@ -97,6 +101,7 @@ void StartupCall::startup()
     ProjectConfig &projectConfig = m_app->m_projectConfig;
 
     // set search path
+    pStack->addSearchPath("/Users/mrj/Documents/workspace/jiyu/game/upd");
     string path = CCFileUtils::sharedFileUtils()->fullPathForFilename(projectConfig.getScriptFileRealPath().c_str());
     size_t pos;
     while ((pos = path.find_first_of("\\")) != std::string::npos)

@@ -1,4 +1,3 @@
-
 -- for CCLuaEngine
 function __G__TRACKBACK__(errorMessage)
     print("----------------------------------------")

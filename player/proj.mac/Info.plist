@@ -32,5 +32,10 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>SimHei.ttf</string>
+		<string>FZLBJW--GB1-0.ttf</string>
+	</array>
 </dict>
 </plist>

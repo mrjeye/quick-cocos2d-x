@@ -65,7 +65,8 @@ using namespace cocos2d::extra;
     isMaximized = NO;
     hasPopupDialog = NO;
     debugLogFile = 0;
-
+    // [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"QUICK_COCOS2DX_ROOT"];
+    
     NSString *path = [[NSUserDefaults standardUserDefaults] objectForKey:@"QUICK_COCOS2DX_ROOT"];
     if (path && [path length])
     {

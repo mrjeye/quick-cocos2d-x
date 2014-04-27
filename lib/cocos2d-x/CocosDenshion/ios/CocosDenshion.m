@@ -187,7 +187,7 @@ static BOOL _mixerRateSet = NO;
     //ALenum            error;
     context = NULL;
     ALCdevice        *newDevice = NULL;
-
+    
     //Set the mixer rate for the audio mixer
     if (!_mixerRateSet) {
         _mixerSampleRate = CD_SAMPLE_RATE_DEFAULT;

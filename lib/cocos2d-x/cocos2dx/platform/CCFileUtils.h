@@ -272,7 +272,13 @@ public:
       * @since v2.1
       */
      void addSearchPath(const char* path);
-
+    
+    /**
+     * Mr.J(Jan_17,2013) == Insert search path.
+     *
+     */
+    void insertSearchPath(const char* path);
+    
     /**
       * Removes all paths.
       *
@@ -459,6 +465,34 @@ protected:
      *  The singleton pointer of CCFileUtils.
      */
     static CCFileUtils* s_sharedFileUtils;
+private:
+    // crypto
+    
+    // key
+    std::string m_cryptoKey;
+    // ext names
+    std::string m_cryptoExtnames;
+    // enabled
+    bool m_cryptoEnabled;
+protected:
+    /**
+     * crypto
+     */
+    std::string getExtname(const char* file);
+    unsigned char* cryptoData(unsigned char* data, unsigned long* pSize);
+public:
+    /**
+     * Set the crypto info.
+     *
+     * key:         key
+     * extnames:    extnames
+     */
+    void enabledCrypto(const char* key, const char* extnames);
+    
+    /**
+     * Disable crypto
+     */
+    void disableCrypto();
 };
 
 // end of platform group

@@ -167,6 +167,7 @@ bool CCHTTPRequest::start(void)
     curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, this);
     curl_easy_setopt(m_curl, CURLOPT_HEADERFUNCTION, writeHeaderCURL);
     curl_easy_setopt(m_curl, CURLOPT_WRITEHEADER, this);
+    curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, false);
     curl_easy_setopt(m_curl, CURLOPT_PROGRESSFUNCTION, progressCURL);
     curl_easy_setopt(m_curl, CURLOPT_PROGRESSDATA, this);
     curl_easy_setopt(m_curl, CURLOPT_COOKIEFILE, "");
@@ -298,7 +299,26 @@ void CCHTTPRequest::checkCURLState(float dt)
 
 void CCHTTPRequest::update(float dt)
 {
-    if (m_state == kCCHTTPRequestStateInProgress) return;
+    if (m_state == kCCHTTPRequestStateInProgress) {
+#if CC_LUA_ENGINE_ENABLED > 0
+        if (m_listener && m_progressChanged){
+            m_progressChanged = false;
+            
+            CCLuaValueDict dict;
+            
+            dict["name"] = CCLuaValue::stringValue("processing");
+            dict["dlnow"] = CCLuaValue::floatValue(m_dlnow);
+            
+            CCLuaStack *stack = CCLuaEngine::defaultEngine()->getLuaStack();
+            stack->clean();
+            stack->pushCCLuaValueDict(dict);
+            stack->executeFunctionByHandler(m_listener, 1);
+        }
+#endif
+        
+        return;
+    }
+    
     CCDirector::sharedDirector()->getScheduler()->unscheduleAllForTarget(this);
     if (m_curlState == kCCHTTPRequestCURLStateBusy)
     {
@@ -308,6 +328,8 @@ void CCHTTPRequest::update(float dt)
     if (m_state == kCCHTTPRequestStateCompleted)
     {
         // CCLOG("CCHTTPRequest[0x%04x] - request completed", s_id);
+        m_dlnow = .0;
+        
         if (m_delegate) m_delegate->requestFinished(this);
     }
     else
@@ -324,6 +346,8 @@ void CCHTTPRequest::update(float dt)
         switch (m_state)
         {
             case kCCHTTPRequestStateCompleted:
+                m_dlnow = .0;
+                
                 dict["name"] = CCLuaValue::stringValue("completed");
                 break;
                 
@@ -434,6 +458,10 @@ size_t CCHTTPRequest::onWriteHeader(void *buffer, size_t bytes)
 
 int CCHTTPRequest::onProgress(double dltotal, double dlnow, double ultotal, double ulnow)
 {
+    m_dlnow = dlnow;
+    
+    m_progressChanged = true;
+    
     return m_state == kCCHTTPRequestStateCancelled ? 1: 0;
 }
 

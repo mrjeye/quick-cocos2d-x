@@ -1,4 +1,3 @@
-
 function __G__TRACKBACK__(errorMessage)
     CCLuaLog("----------------------------------------")
     CCLuaLog("LUA ERROR: " .. tostring(errorMessage) .. "\n")

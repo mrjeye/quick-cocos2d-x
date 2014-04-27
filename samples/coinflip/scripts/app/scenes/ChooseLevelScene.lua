@@ -23,7 +23,7 @@ function ChooseLevelScene:ctor()
     self.levelsList = LevelsList.new(rect)
     self.levelsList:addEventListener("onTapLevelIcon", handler(self, self.onTapLevelIcon))
     self:addChild(self.levelsList)
-
+    
     -- create menu
     local backButton = ui.newImageMenuItem({
         image = "#BackButton.png",

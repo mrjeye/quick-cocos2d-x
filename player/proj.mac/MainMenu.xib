@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4514" systemVersion="13A603" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4514" systemVersion="12F45" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" defaultVersion="1070" identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4514"/>
@@ -420,17 +420,17 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="594"/>
-                            <menuItem title="Actual (100%)" state="on" tag="100" keyEquivalent="0" id="595">
+                            <menuItem title="Actual (100%)" state="on" tag="100" keyEquivalent="1" id="595">
                                 <connections>
                                     <action selector="onScreenZoomOut:" target="-1" id="yUj-fN-Rh7"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Zoom Out (75%)" tag="75" keyEquivalent="6" id="pqR-xy-5ip">
+                            <menuItem title="Zoom Out (75%)" tag="75" keyEquivalent="2" id="pqR-xy-5ip">
                                 <connections>
                                     <action selector="onScreenZoomOut:" target="-1" id="yps-LZ-egB"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Zoom Out (50%)" tag="50" keyEquivalent="5" id="596">
+                            <menuItem title="Zoom Out (50%)" tag="50" keyEquivalent="3" id="596">
                                 <connections>
                                     <action selector="onScreenZoomOut:" target="-1" id="654"/>
                                 </connections>

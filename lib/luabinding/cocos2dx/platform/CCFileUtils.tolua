@@ -188,7 +188,13 @@ class CCFileUtils
       * @since v2.1
       */
     void addSearchPath(const char* path);
-
+    
+    /**
+     * Mr.J(Jan_17,2013) == Insert search path
+     *
+     */
+    void insertSearchPath(const char* path);
+    
     /**
      *  Gets the writable path.
      *  @return  The path that can be write/read a file in

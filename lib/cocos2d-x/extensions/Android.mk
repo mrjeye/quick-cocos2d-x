@@ -77,7 +77,6 @@ ifndef $(QUICK_MINI_TARGET)
         GUI/CCScrollView/CCTableView.cpp \
         GUI/CCScrollView/CCTableViewCell.cpp \
         network/WebSocket.cpp
-
 endif
 
 

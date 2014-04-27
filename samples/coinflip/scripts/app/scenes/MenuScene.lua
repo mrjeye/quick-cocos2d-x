@@ -12,7 +12,7 @@ function MenuScene:ctor()
 
     self.adBar = AdBar.new()
     self:addChild(self.adBar)
-
+	
     -- create menu
     self.moreGamesButton = BubbleButton.new({
         image = "#MenuSceneMoreGamesButton.png",

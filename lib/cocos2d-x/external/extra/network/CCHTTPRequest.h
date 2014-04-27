@@ -144,6 +144,8 @@ private:
     , m_responseBufferLength(0)
     , m_responseDataLength(0)
     , m_curlState(kCCHTTPRequestCURLStateIdle)
+    , m_dlnow(0)
+    , m_progressChanged(false)
     {
     }
     bool initWithDelegate(CCHTTPRequestDelegate* delegate, const char *url, int method);
@@ -190,7 +192,11 @@ private:
     size_t onWriteData(void *buffer, size_t bytes);
     size_t onWriteHeader(void *buffer, size_t bytes);
     int onProgress(double dltotal, double dlnow, double ultotal, double ulnow);
-
+    
+    // progress
+    bool m_progressChanged;
+    double m_dlnow;
+    
     // curl callback
 #ifdef _WINDOWS_
     static DWORD WINAPI requestCURL(LPVOID userdata);

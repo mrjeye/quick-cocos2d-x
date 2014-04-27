@@ -304,7 +304,7 @@ function display.newSprite(filename, x, y)
         echoError("display.newSprite() - create sprite failure, filename %s", tostring(filename))
         sprite = CCSprite:create()
     end
-
+    
     return sprite
 end
 
