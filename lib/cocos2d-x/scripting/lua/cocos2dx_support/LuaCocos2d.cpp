@@ -1,6 +1,6 @@
 /*
 ** Lua binding: Cocos2d
-** Generated automatically by tolua++-1.0.92 on 04/18/14 14:08:42.
+** Generated automatically by tolua++-1.0.92 on Sun Apr 27 19:50:59 2014.
 */
 
 /****************************************************************************
@@ -8927,6 +8927,39 @@ static int tolua_Cocos2d_CCFileUtils_addSearchPath00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'addSearchPath'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: insertSearchPath of class  CCFileUtils */
+#ifndef TOLUA_DISABLE_tolua_Cocos2d_CCFileUtils_insertSearchPath00
+static int tolua_Cocos2d_CCFileUtils_insertSearchPath00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"CCFileUtils",0,&tolua_err) ||
+     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  CCFileUtils* self = (CCFileUtils*)  tolua_tousertype(tolua_S,1,0);
+  const char* path = ((const char*)  tolua_tostring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'insertSearchPath'", NULL);
+#endif
+  {
+   self->insertSearchPath(path);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'insertSearchPath'.",&tolua_err);
  return 0;
 #endif
 }
@@ -65783,6 +65816,7 @@ TOLUA_API int tolua_Cocos2d_open (lua_State* tolua_S)
    tolua_function(tolua_S,"addSearchResolutionsOrder",tolua_Cocos2d_CCFileUtils_addSearchResolutionsOrder00);
    tolua_function(tolua_S,"setSearchRootPath",tolua_Cocos2d_CCFileUtils_setSearchRootPath00);
    tolua_function(tolua_S,"addSearchPath",tolua_Cocos2d_CCFileUtils_addSearchPath00);
+   tolua_function(tolua_S,"insertSearchPath",tolua_Cocos2d_CCFileUtils_insertSearchPath00);
    tolua_function(tolua_S,"getWritablePath",tolua_Cocos2d_CCFileUtils_getWritablePath00);
    tolua_function(tolua_S,"getCachePath",tolua_Cocos2d_CCFileUtils_getCachePath00);
    tolua_function(tolua_S,"setWritablePath",tolua_Cocos2d_CCFileUtils_setWritablePath00);
